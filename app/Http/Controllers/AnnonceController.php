@@ -24,7 +24,6 @@ class AnnonceController extends Controller
         $today = now();
         return view('annonces.create', compact('today'));
     }
-
     public function store(Request $request)
 {
     $request->validate([
@@ -53,10 +52,32 @@ class AnnonceController extends Controller
         'file_attachment' => 'nullable|mimes:pdf,jpeg,png,docx,doc|max:2048',
     ]);
 
-    // Store logic here...
+    // Handle file upload
+    $filePath = null;
+    if ($request->hasFile('file_attachment')) {
+        $filePath = $request->file('file_attachment')->store('annonces_files', 'public');
+    }
 
+    // Create the announcement
+    $annonce = Annonce::create([
+        'user_id' => auth()->id(),
+        'title' => $request->input('title'),
+        'content' => $request->input('content'),
+        'type' => $request->input('type'),
+        'ice' => $request->input('ice'),
+        'status' => 'pending',
+        'date_parution' => $request->input('date_parution'),
+        'canal_de_publication' => $request->input('canal_de_publication'),
+        'ville' => $request->input('ville'),
+        'publication_web' => $request->boolean('publication_web'),
+        'file_attachment' => $filePath,
+        'ref_web' => 'REF-' . strtoupper(uniqid()), // Generate ref_web
+    ]);
+
+    // Redirect to confirmation page
     return redirect()->route('annonces.confirmation', $annonce->id);
 }
+    
 
 
 

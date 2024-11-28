@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Http\Request; // Import the correct Request class
 
 class AuthenticatedSessionController extends Controller
 {
@@ -25,25 +25,24 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
 {
     $request->authenticate();
-
     $request->session()->regenerate();
 
-    $user = Auth::user(); // Get the authenticated user
+    $user = Auth::user();
 
     // Redirect based on role
-    switch ($user->role) {
-        case 'sous-admin':
-            return redirect()->route('sousAdmin'); // Redirect to sous-admin dashboard
-        case 'admin':
-            return redirect()->route('admin'); // Redirect to admin dashboard
-        case 'client':
-            return redirect()->route('dashboard'); // Redirect to client dashboard
-        default:
-            // Handle unknown roles (Optional)
-            Auth::logout(); // Log out user if the role is unrecognized
-            return redirect()->route('login')->with('error', 'Unauthorized access.');
+    if (!$user->role) {
+        Auth::logout(); // Logout the user if role is invalid
+        return redirect()->route('login')->with('error', 'Your account is not properly configured.');
     }
+
+    return match ($user->role) {
+        'sous-admin' => redirect()->route('sousAdmin'),
+        'admin' => redirect()->route('admin'),
+        'client' => redirect()->route('dashboard'),
+        default => redirect()->route('login')->with('error', 'Invalid role.'),
+    };
 }
+
 
     /**
      * Destroy an authenticated session.

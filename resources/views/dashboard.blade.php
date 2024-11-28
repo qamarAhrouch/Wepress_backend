@@ -20,13 +20,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('dashboard') }}">Dashboard</a>
+                        <a class="nav-link active" href="{{ route('annonces.create') }}">Create Annonce</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('annonces.index') }}">My Announcements</a>
+                        <a class="nav-link" href="{{ route('annonce.publier') }}">Legale Announcements</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('profile.edit') }}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                         <!-- Authentication -->
+                         <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+
+                            <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </a>
+                        </form>
                     </li>
                 </ul>
             </div>

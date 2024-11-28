@@ -16,9 +16,8 @@
                     <option value="Digital uniquement">Digital uniquement</option>
                 </select>
             </div>
-
             <div style="margin-bottom: 10px;">
-                <label for="title" style="display: block; font-weight: bold; margin-bottom: 5px;">Title:</label>
+                <label for="title" style="display: block; font-weight: bold; margin-bottom: 5px;">Nom de sociéte:</label>
                 <input type="text" name="title" id="title" required style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;" oninput="updatePreview()">
             </div>
 
@@ -153,5 +152,29 @@
         });
     });
 </script>
+<script>
+    function updatePreview() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+        const dateParution = document.getElementById('date_parution').value;
+
+        document.getElementById('previewTitle').textContent = title || 'No Title';
+        document.getElementById('previewBody').textContent = content || 'No Content';
+
+        // Display the selected date in the preview
+        const previewDate = document.getElementById('previewDate');
+        if (dateParution) {
+            previewDate.textContent = `Date Parution: ${dateParution}`;
+        } else {
+            previewDate.textContent = 'Date Parution: Not Selected';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('date_parution');
+        dateInput.addEventListener('input', updatePreview);
+    });
+</script>
+
 
 @endsection

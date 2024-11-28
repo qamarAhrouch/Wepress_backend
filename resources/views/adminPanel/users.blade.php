@@ -61,6 +61,9 @@
 <body>
     <div class="header-actions">
         <h1>Manage Users</h1>
+     
+        <a href="{{ route('admin') }}" class="btn btn-primary">Dashboard</a>
+   
         <!-- Add User Button -->
         <a href="{{ route('admin.createUser') }}" class="btn btn-success">Add User</a>
     </div>

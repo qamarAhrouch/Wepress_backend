@@ -7,25 +7,26 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SousAdminController;
 use Illuminate\Support\Facades\Route;
 
-// Root Route: Displays the welcome page
+// Redirect root to login
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-// Dashboard Route for Clients
-Route::middleware(['auth', 'verified'])->group(function () {
+// Routes for client dashboard
+Route::middleware(['auth', 'verified', 'role:client'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-// Dashboard Route for Admins
-Route::middleware(['auth', 'verified'])->group(function () {
+// Routes for admin dashboard
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/dashAdmin', [AdminController::class, 'index'])->name('admin');
 });
 
-// Dashboard Route for Sous-Admins
-Route::middleware(['auth', 'verified'])->group(function () {
+// Routes for sous-admin dashboard
+Route::middleware(['auth', 'verified', 'role:sous-admin'])->group(function () {
     Route::get('/SousAdmin', [SousAdminController::class, 'index'])->name('sousAdmin');
 });
+
 
 // Authenticated Routes: Accessible only to logged-in users
 Route::middleware('auth')->group(function () {
@@ -71,12 +72,4 @@ Route::get('/annonce-publier', [AnnonceController::class, 'publierIndex'])->name
 // Authentication Routes: Ensures authentication functionality
 require __DIR__ . '/auth.php';
 
-// If you have additional admin authentication, uncomment the line below
-// require __DIR__ . '/admin-auth.php';
 
-/*
- * Updates:
- * - Added role-based restrictions directly in ProfileController for profile management.
- * - Enhanced the Profile routes for edit, update, and delete functionalities.
- * - Verified the AnnonceController routes remain consistent with the existing role setup.
- */

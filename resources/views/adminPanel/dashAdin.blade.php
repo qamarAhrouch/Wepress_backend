@@ -202,7 +202,8 @@
     </form>
     <a href="{{ route('annonceapproved') }}" class="button success">View Approved Announcements</a>
     <a href="{{ route('annoncerejected') }}" class="button danger">View Rejected Announcements</a>
-</div>
+    <a href="{{ route('admin.users') }}" class="button success">Manage Users</a>
+    <a href="{{ route('profile.edit') }}" class="button success">Manage Profile</a></div>
 
 
 
