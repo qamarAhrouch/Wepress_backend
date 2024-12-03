@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SousAdminController;
+use App\Http\Controllers\PackController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -13,23 +14,24 @@ Route::get('/', function () {
 });
 
 // Routes for client dashboard
-Route::middleware(['auth', 'verified', 'role:client'])->group(function () {
+Route::middleware(['auth', 'role:client'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // Routes for admin dashboard
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashAdmin', [AdminController::class, 'index'])->name('admin');
 });
 
 // Routes for sous-admin dashboard
-Route::middleware(['auth', 'verified', 'role:sous-admin'])->group(function () {
+Route::middleware(['auth', 'role:sous-admin'])->group(function () {
     Route::get('/SousAdmin', [SousAdminController::class, 'index'])->name('sousAdmin');
 });
 
-
 // Authenticated Routes: Accessible only to logged-in users
 Route::middleware('auth')->group(function () {
+    Route::get('/profile/view', [ProfileController::class, 'view'])->name('profile.view');
+
     // **Profile Routes**: Role-based access added in `ProfileController` to manage user profiles
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,6 +49,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/annonces/{annonce}/confirmation', [AnnonceController::class, 'confirmation'])->name('annonces.confirmation'); // Confirmation page
     Route::post('/annonces/{annonce}/payment', [AnnonceController::class, 'payment'])->name('annonces.payment'); // Payment route
     Route::post('/annonces/{annonce}/cancel', [AnnonceController::class, 'cancel'])->name('annonces.cancel'); // Cancel route
+
+    // New route for handling payment simulation
+    Route::post('/annonces/{annonce}/payer', [AnnonceController::class, 'payment'])->name('annonces.payment'); // Simulate payment
+
+    Route::get('/packs', [PackController::class, 'index'])->name('packs.index');
+    Route::post('/packs/purchase', [PackController::class, 'purchase'])->name('packs.purchase');
 });
 
 // **Admin Routes**: Specific to admin actions
@@ -56,6 +64,9 @@ Route::post('/annonce/reject/{id}', [AdminController::class, 'rejectAnnonce'])->
 Route::get('/annonce/approve/', [AdminController::class, 'approvedAnnonce'])->name('annonceapproved');
 Route::get('/annonce/reject/', [AdminController::class, 'rejectedAnnonce'])->name('annoncerejected');
 Route::get('/admin/annonce/{id}/view', [AdminController::class, 'viewAnnonce'])->name('annonce.view');
+
+// Route for generating the invoice
+Route::get('/annonces/{annonce}/invoice', [AnnonceController::class, 'generateInvoice'])->name('annonces.invoice');
 
 // **Admin User Management**
 Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users'); // List of users
@@ -69,7 +80,8 @@ Route::delete('/admin/user/delete/{id}', [AdminController::class, 'deleteUser'])
 // **Publishing Route**
 Route::get('/annonce-publier', [AnnonceController::class, 'publierIndex'])->name('annonce.publier');
 
-// Authentication Routes: Ensures authentication functionality
+// Authentication Routes
 require __DIR__ . '/auth.php';
 
-
+// **Logout Route**
+Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');

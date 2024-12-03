@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Annonce extends Model
 {
     use HasFactory;
@@ -35,14 +36,14 @@ class Annonce extends Model
             if ($lastAnnonce && $lastAnnonce->ref_web) {
                 $matches = [];
                 // Extract the numeric part from the last `ref_web`
-                preg_match('/Ref-(\d+\.\d+)/', $lastAnnonce->ref_web, $matches);
+                preg_match('/Ref-(\d+)/', $lastAnnonce->ref_web, $matches);
                 if (isset($matches[1])) {
-                    $lastRefNumber = (float) $matches[1];
+                    $lastRefNumber = (int) $matches[1];
                 }
             }
 
-            // Increment the numeric part and format it
-            $newRefNumber = number_format($lastRefNumber + 0.0001, 4, '.', '');
+            // Increment the numeric part
+            $newRefNumber = str_pad($lastRefNumber + 1, 5, '0', STR_PAD_LEFT);
 
             // Assign the new value to `ref_web`
             $annonce->ref_web = 'Ref-' . $newRefNumber;

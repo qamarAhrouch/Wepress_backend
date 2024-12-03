@@ -63,10 +63,7 @@
         <p style="margin: 5px 0; font-size: 16px; font-style: italic;">{{ $annonce->ref_web }}</p>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <strong>Date Parution:</strong>
-        <p style="margin: 5px 0; font-size: 16px;">{{ $annonce->date_parution }}</p>
-    </div>
+    
 
     <!-- Approve, Reject, and Back Buttons -->
     <div style="text-align: center; margin-top: 20px;">

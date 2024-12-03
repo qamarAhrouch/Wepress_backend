@@ -28,14 +28,22 @@
 
     <div style="margin-bottom: 15px;">
         <label for="ice" style="display: block; font-weight: bold; margin-bottom: 5px;">ICE:</label>
-        <input type="text" name="ice" id="ice" value="{{ $annonce->ice }}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input 
+            type="text" 
+            name="ice" 
+            id="ice" 
+            value="{{ $annonce->ice }}" 
+            required 
+            minlength="15" 
+            maxlength="15" 
+            pattern="\d{15}" 
+            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" 
+            oninput="validateICE()"
+        >
+        <small id="iceError" style="color: red; display: none;">ICE must be exactly 15 digits.</small>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="date_parution" style="display: block; font-weight: bold; margin-bottom: 5px;">Date Parution:</label>
-        <input type="date" name="date_parution" id="date_parution" value="{{ $annonce->date_parution }}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
-
+   
     <!-- Canal de Publication Field -->
     <div style="margin-bottom: 15px;">
         <label for="canal_de_publication" style="display: block; font-weight: bold; margin-bottom: 5px;">Canal de Publication:</label>
@@ -81,3 +89,19 @@
     </div>
 </form>
 @endsection
+
+
+<script>
+    function validateICE() {
+        const iceInput = document.getElementById('ice');
+        const iceError = document.getElementById('iceError');
+
+        if (iceInput.value.length === 15 && /^\d{15}$/.test(iceInput.value)) {
+            iceError.style.display = 'none';
+            iceInput.setCustomValidity('');
+        } else {
+            iceError.style.display = 'block';
+            iceInput.setCustomValidity('ICE must be exactly 15 digits.');
+        }
+    }
+</script>

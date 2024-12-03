@@ -12,6 +12,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    public function view()
+    {
+        $user = Auth::user(); // Get the authenticated user
+        return view('profile.view', compact('user')); // Pass user data to the view
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -25,28 +31,34 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $user = $request->user();
-
-        // Validate the current password
-        if (!Hash::check($request->input('current_password'), $user->password)) {
-            return Redirect::route('profile.edit')->withErrors(['current_password' => 'The current password is incorrect.']);
+        $user = Auth::user();
+    
+        // Validate input
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'current_password' => ['required', 'string'],
+            'password' => ['nullable', 'confirmed', 'min:8'],
+        ]);
+    
+        // Check if current password is correct
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'The provided password does not match your current password.']);
         }
-
-        // Update the user's information
-        $user->fill($request->except(['password', 'current_password', 'password_confirmation']));
-
-        // Update the password if provided
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->input('password'));
-        }
-
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    
+        // Update user details
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+        ]);
+    
+        // Redirect to the profile view page with a success message
+        return redirect()->route('profile.view')->with('status', 'profile-updated');
     }
-
+    
     /**
      * Delete the user's account.
      */

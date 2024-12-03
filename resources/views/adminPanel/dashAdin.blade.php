@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome for Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Pending Announcements</title>
     <style>
         /* General Page Styling */
@@ -192,18 +196,65 @@
 </head>
 <body>
 
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+    <a class="navbar-brand" 
+        href="{{ match(auth()->user()->role) {
+            'admin' => route('admin'),
+            'sous-admin' => route('sousAdmin'),
+            'client' => route('dashboard'),
+            default => route('login')
+        } }}">
+            {{ auth()->user()->name }}
+    </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       href="{{ match(auth()->user()->role) {
+                           'admin' => route('admin'),
+                           'sous-admin' => route('sousAdmin'),
+                           'client' => route('dashboard'),
+                           default => route('login')
+                       } }}">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('annonces.index') }}">My Announcements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('profile.view') }}">Profile</a>
+                </li>
+                <!-- Logout Button -->
+                <li class="nav-item">
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="nav-link btn btn-link text-white" style="text-decoration: none;">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <h1>Welcome to Dash Admin, {{ $admin->name }}</h1>
 
 <!-- Logout and Announcement Links -->
 <div class="button-container">
-    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
-        @csrf
-        <button type="submit" class="button logout">Log Out</button>
-    </form>
+    
     <a href="{{ route('annonceapproved') }}" class="button success">View Approved Announcements</a>
     <a href="{{ route('annoncerejected') }}" class="button danger">View Rejected Announcements</a>
     <a href="{{ route('admin.users') }}" class="button success">Manage Users</a>
-    <a href="{{ route('profile.edit') }}" class="button success">Manage Profile</a></div>
+    <a href="{{ route('profile.view') }}" class="button success">Manage Profile</a>
+
+</div>
 
 
 
@@ -229,10 +280,6 @@
                 <label for="date_creation">Date de Création:</label>
                 <input type="date" name="date_creation" id="date_creation" value="{{ $filters['date_creation'] ?? '' }}">
             </div>
-            <div class="filter-field">
-                <label for="date_parution">Date de Parution:</label>
-                <input type="date" name="date_parution" id="date_parution" value="{{ $filters['date_parution'] ?? '' }}">
-            </div>
         </div>
         <div class="filter-actions">
             <button type="submit">Filter</button>
@@ -250,7 +297,7 @@
             <th>Type</th>
             <th>Status</th>
             <th>Date Creation</th>
-            <th>Date Parution</th>
+            <th>Paiment Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -263,12 +310,13 @@
             <td>{{ ucfirst($annonce->status) }}</td>
             <td>{{ $annonce->created_at->format('Y-m-d') }}</td>
             <td>
-                @if ($annonce->date_parution)
-                    {{ \Carbon\Carbon::parse($annonce->date_parution)->format('Y-m-d') }}
+                @if ($annonce->paiement)
+                    {{ ucfirst($annonce->paiement->status) }}
                 @else
-                    N/A
+                    Imcomplet
                 @endif
             </td>
+
             <td>
                 <a href="{{ route('admin.annonces.show', $annonce->id) }}" class="action-link">View</a>
             </td>

@@ -10,43 +10,47 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     public function index(Request $request)
-    {
-        $admin = Auth::user(); // Authenticated admin user
-        $users = User::where('role', 'client', 'sous-admin')->get();
+{
+    $admin = Auth::user(); // Authenticated admin user
+    $users = User::whereIn('role', ['client', 'sous-admin'])->get();
 
-        // Retrieve filter parameters
-        $filters = [
-            'ref_web' => $request->input('ref_web'),
-            'type' => $request->input('type'),
-            'date_creation' => $request->input('date_creation'),
-            'date_parution' => $request->input('date_parution'),
-        ];
+    // Retrieve filter parameters
+    $filters = [
+        'ref_web' => $request->input('ref_web'),
+        'type' => $request->input('type'),
+        'date_creation' => $request->input('date_creation'),
+        'date_parution' => $request->input('date_parution'),
+    ];
 
-        // Start building the query for pending announcements
-        $query = Annonce::with('user')->where('status', 'pending');
+    // Start building the query for pending announcements
+    $query = Annonce::with(['user', 'paiement']) // Eager load the `paiement` relationship
+                    ->where('status', 'pending');
 
-        // Apply filters if they exist
-        if ($filters['ref_web']) {
-            $query->where('ref_web', $filters['ref_web']);
-        }
-
-        if ($filters['type']) {
-            $query->where('type', $filters['type']);
-        }
-
-        if ($filters['date_creation']) {
-            $query->whereDate('created_at', $filters['date_creation']);
-        }
-
-        if ($filters['date_parution']) {
-            $query->whereDate('date_parution', $filters['date_parution']);
-        }
-
-        // Get the filtered results
-        $annonces = $query->get();
-
-        return view('/adminPanel/dashAdin', compact('admin', 'annonces', 'filters', 'users'));
+    // Apply filters if they exist
+    if ($filters['ref_web']) {
+        $query->where('ref_web', $filters['ref_web']);
     }
+
+    if ($filters['type']) {
+        $query->where('type', $filters['type']);
+    }
+
+    if ($filters['date_creation']) {
+        $query->whereDate('created_at', $filters['date_creation']);
+    }
+
+    if ($filters['date_parution']) {
+        $query->whereDate('date_parution', $filters['date_parution']);
+    }
+
+    // Get the filtered results
+    $annonces = $query->get();
+
+    return view('/adminPanel/dashAdin', compact('admin', 'annonces', 'filters', 'users'));
+}
+
+    
+
 
     public function show(Annonce $annonce)
     {
@@ -92,6 +96,7 @@ class AdminController extends Controller
 
     public function approvedAnnonce(Request $request)
     {
+        $admin = Auth::user();
         // Retrieve filter parameters
         $filters = [
             'ref_web' => $request->input('ref_web'),
@@ -123,11 +128,12 @@ class AdminController extends Controller
         // Get the filtered results
         $annonces = $query->get();
 
-        return view('/adminPanel/approvedAnnonces', compact('annonces', 'filters'));
+        return view('/adminPanel/approvedAnnonces', compact('annonces', 'filters', 'admin'));
     }
 
     public function rejectedAnnonce(Request $request)
     {
+        $admin = Auth::user();
         // Retrieve filter parameters
         $filters = [
             'ref_web' => $request->input('ref_web'),
@@ -160,7 +166,7 @@ class AdminController extends Controller
         // Get the filtered results
         $annonces = $query->get();
 
-        return view('/adminPanel/rejectedAnnonces', compact('annonces', 'filters'));
+        return view('/adminPanel/rejectedAnnonces', compact('annonces', 'filters', 'admin'));
     }
 
     public function viewAnnonce($id)
@@ -177,17 +183,25 @@ class AdminController extends Controller
         return view('/adminPanel/viewAnnonce', compact('annonce'));
     }
 
-    public function users()
+    public function users(Request $request)
     {
         $authUserId = auth()->id(); // Get the currently authenticated user's ID
 
-        // Get all users with the roles 'client' and 'sous-admin', excluding the authenticated user
+        // Get the search query from the request
+        $search = $request->input('search');
+
+        // Search users based on name or email, excluding the authenticated user
         $users = User::whereIn('role', ['client', 'sous-admin'])
                     ->where('id', '!=', $authUserId)
+                    ->when($search, function ($query, $search) {
+                        $query->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%");
+                    })
                     ->get();
 
-        return view('/adminPanel/users', compact('users'));
+        return view('/adminPanel/users', compact('users', 'search'));
     }
+
 
     public function createUser()
     {

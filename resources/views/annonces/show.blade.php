@@ -38,10 +38,9 @@
         <strong>Ref Web:</strong>
         <p style="margin: 5px 0; font-size: 16px; font-style: italic;">{{ $annonce->ref_web }}</p>
     </div>
-
-    <div style="margin-bottom: 15px;">
-        <strong>Date Parution:</strong>
-        <p style="margin: 5px 0; font-size: 16px;">{{ $annonce->date_parution }}</p>
+    <!-- Back Button -->
+    <div class="back-button">
+        <a href="{{ session('previous') }}" style="color: #007bff; text-decoration: underline;">Back</a>
     </div>
 </div>
 @endsection

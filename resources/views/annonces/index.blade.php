@@ -43,67 +43,52 @@
             <th style="padding: 10px;">Title</th>
             <th style="padding: 10px;">Type</th>
             <th style="padding: 10px;">Status</th>
-            <th style="padding: 10px;">Date Parution</th>
+            <th style="padding: 10px;">Paiement</th>
             <th style="padding: 10px;">Date Creation</th>
             <th style="padding: 10px;">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($annonces as $annonce)
-        <tr style="border-bottom: 1px solid #dee2e6;">
-            <td style="padding: 10px;">{{ $annonce->title }}</td>
-            <td style="padding: 10px;">{{ $annonce->type }}</td>
-            <td style="padding: 10px;">{{ ucfirst($annonce->status) }}</td>
-            <td style="padding: 10px;">{{ $annonce->date_parution ?? 'N/A' }}</td>
-            <td style="padding: 10px;">{{ $annonce->created_at->format('Y-m-d') }}</td>
-            <td style="padding: 10px;">
-                <a href="{{ route('annonces.show', $annonce) }}" style="margin-right: 10px; text-decoration: none; color: #007bff;">View</a>
+    @foreach ($annonces as $annonce)
+    <tr style="border-bottom: 1px solid #dee2e6;">
+        <td style="padding: 10px;">{{ $annonce->title }}</td>
+        <td style="padding: 10px;">{{ $annonce->type }}</td>
+        <td style="padding: 10px; color: {{ $annonce->status === 'approved' ? 'green' : ($annonce->status === 'rejected' ? 'red' : 'black') }};">
+            {{ ucfirst($annonce->status) }}
+        </td>
+        <td style="padding: 10px;">
+            @if ($annonce->paiement)
+                {{ ucfirst($annonce->paiement->status) }}
+            @else
+                Not Paid
+            @endif
+        </td>
+        <td style="padding: 10px;">{{ $annonce->created_at->format('Y-m-d') }}</td>
+        <td style="padding: 10px;">
+            <a href="{{ route('annonces.show', $annonce) }}" style="margin-right: 10px; text-decoration: none; color: #007bff;">View</a>
 
-                @if (!in_array($annonce->status, ['approved', 'rejected']))
-                    <a href="{{ route('annonces.edit', $annonce->id) }}" style="margin-right: 10px; text-decoration: none; color: #28a745;">Edit</a>
-                    <form action="{{ route('annonces.destroy', $annonce) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(event);">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer;">Delete</button>
-                    </form>
-                @else
-                    <span style="color: gray; cursor: not-allowed;">Edit</span>
-                    <span style="color: gray; cursor: not-allowed;">Delete</span>
-                @endif
-            </td>
-        </tr>
-        @endforeach
+            @if (!in_array($annonce->status, ['approved', 'rejected']))
+                <a href="{{ route('annonces.edit', $annonce->id) }}" style="margin-right: 10px; text-decoration: none; color: #28a745;">Edit</a>
+                <form action="{{ route('annonces.destroy', $annonce) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(event);">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer;">Delete</button>
+                </form>
+            @else
+                <span style="color: gray; cursor: not-allowed;">Edit</span>
+                <span style="color: gray; cursor: not-allowed;">Delete</span>
+            @endif
+
+            @if ($annonce->paiement && $annonce->paiement->status === 'complet')
+                <a href="{{ route('annonces.invoice', $annonce->id) }}" style="margin-left: 10px; text-decoration: none; color: #007bff;">
+                    Invoice
+                </a>
+            @endif
+        </td>
+    </tr>
+    @endforeach
     </tbody>
 </table>
-<br><br>
-<!-- Table for Announcements from Other Users
-<h1 style="text-align: center; margin-bottom: 20px;">Annonce Légale</h1> <br><br>
-<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-    <thead>
-        <tr style="background-color: #f8f9fa; text-align: left; border-bottom: 2px solid #dee2e6;">
-            <th style="padding: 10px;">User</th>
-            <th style="padding: 10px;">Title</th>
-            <th style="padding: 10px;">Type</th>
-            <th style="padding: 10px;">Date Parution</th>
-            <th style="padding: 10px;">Date Creation</th>
-            <th style="padding: 10px;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($annoncess->where('user_id', '!=', auth()->id()) as $annonce)
-        <tr style="border-bottom: 1px solid #dee2e6;">
-            <td style="padding: 10px;">{{ $annonce->user->name ?? 'Unknown' }}</td>
-            <td style="padding: 10px;">{{ $annonce->title }}</td>
-            <td style="padding: 10px;">{{ $annonce->type }}</td>
-            <td style="padding: 10px;">{{ $annonce->date_parution ?? 'N/A' }}</td>
-            <td style="padding: 10px;">{{ $annonce->created_at->format('Y-m-d') }}</td>
-            <td style="padding: 10px;">
-                <a href="{{ route('annonces.show', $annonce) }}" style="margin-right: 10px; text-decoration: none; color: #007bff;">View</a>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table> -->
 
 <script>
     function confirmDelete(event) {

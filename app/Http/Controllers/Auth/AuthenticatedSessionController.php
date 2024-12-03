@@ -23,26 +23,26 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
-{
-    $request->authenticate();
-    $request->session()->regenerate();
-
-    $user = Auth::user();
-
-    // Redirect based on role
-    if (!$user->role) {
-        Auth::logout(); // Logout the user if role is invalid
-        return redirect()->route('login')->with('error', 'Your account is not properly configured.');
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
+    
+        $user = Auth::user();
+    
+        if (!$user->role) {
+            Auth::logout(); // Logout the user if role is invalid
+            return redirect()->route('login')->with('error', 'Your account is not properly configured.');
+        }
+    
+        // Redirect users based on role
+        return match ($user->role) {
+            'sous-admin' => redirect()->route('sousAdmin'),
+            'admin' => redirect()->route('admin'),
+            'client' => redirect()->route('dashboard'),
+            default => redirect()->route('login')->with('error', 'Invalid role.'),
+        };
     }
-
-    return match ($user->role) {
-        'sous-admin' => redirect()->route('sousAdmin'),
-        'admin' => redirect()->route('admin'),
-        'client' => redirect()->route('dashboard'),
-        default => redirect()->route('login')->with('error', 'Invalid role.'),
-    };
-}
-
+    
 
     /**
      * Destroy an authenticated session.
@@ -50,11 +50,9 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
         return redirect('/login');
     }
+
 }

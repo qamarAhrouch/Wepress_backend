@@ -69,6 +69,11 @@
 
         <!-- Announcement Details -->
         <div class="field">
+            <span class="field-label">User:</span>
+            <span class="field-value">{{ $annonce->user->name ?? 'No user provided' }}</span>
+        </div>
+        
+        <div class="field">
             <span class="field-label">Title:</span>
             <span class="field-value">{{ $annonce->title ?? 'No title provided' }}</span>
         </div>
@@ -122,21 +127,6 @@
         </div>
 
         <div class="field">
-            <span class="field-label">Date Parution:</span>
-            <span class="field-value">
-                @if ($annonce->date_parution)
-                    {{ \Carbon\Carbon::parse($annonce->date_parution)->format('Y-m-d') }}
-                @else
-                    No parution date provided
-                @endif
-            </span>
-        </div>
-
-        <div class="field">
-            <span class="field-label">User:</span>
-            <span class="field-value">{{ $annonce->user->name ?? 'No user provided' }}</span>
-        </div>
-        <div class="field">
             <span class="field-label">Status:</span>
             <span class="field-value">{{ $annonce->status?? 'no status found!!' }}</span>
         </div>
@@ -148,7 +138,7 @@
         </div>
 
         <div class="back-button">
-            <a href="{{ url()->previous() }}">Back</a>
+            <a href="{{ session('admin_previous_url', route('admin')) }}">Back</a>
         </div>
     </div>
 </body>
