@@ -135,7 +135,14 @@ class AnnonceController extends Controller
 
             $pricePerAnnonce = $pack->price_per_annonce;
             $packId = $pack->id; // Save the pack_id
+
+            // Decrement remaining annonces
             $pack->decrement('remaining_annonces'); // Deduct one annonce from the pack
+            
+            // *** Update Total Price of Pack ***
+            // Explanation: We deduct the price of the used annonce from the total pack price.
+            $pack->total_price -= $pricePerAnnonce;
+            $pack->save(); // Save the updated total price to the database
         }
 
         // Create the announcement
@@ -174,6 +181,7 @@ class AnnonceController extends Controller
         // Redirect to confirmation page
         return redirect()->route('annonces.confirmation', $annonce->id);
     }
+
 
     
 

@@ -53,8 +53,10 @@
     <tr style="border-bottom: 1px solid #dee2e6;">
         <td style="padding: 10px;">{{ $annonce->title }}</td>
         <td style="padding: 10px;">{{ $annonce->type }}</td>
-        <td style="padding: 10px; color: {{ $annonce->status === 'approved' ? 'green' : ($annonce->status === 'rejected' ? 'red' : 'black') }};">
+        <td style="padding: 10px; color: {{ $annonce->status === 'approved' ? 'green' : ($annonce->status === 'rejected' ? 'red' : 'orange') }};">
+            <b>
             {{ ucfirst($annonce->status) }}
+            </b>
         </td>
         <td style="padding: 10px;">
             @if ($annonce->paiement)
@@ -65,23 +67,23 @@
         </td>
         <td style="padding: 10px;">{{ $annonce->created_at->format('Y-m-d') }}</td>
         <td style="padding: 10px;">
-            <a href="{{ route('annonces.show', $annonce) }}" style="margin-right: 10px; text-decoration: none; color: #007bff;">View</a>
+            <a href="{{ route('annonces.show', $annonce) }}" style="margin-right: 10px; text-decoration: none; color: #007bff;">Voir</a>
 
             @if (!in_array($annonce->status, ['approved', 'rejected']))
-                <a href="{{ route('annonces.edit', $annonce->id) }}" style="margin-right: 10px; text-decoration: none; color: #28a745;">Edit</a>
+                <a href="{{ route('annonces.edit', $annonce->id) }}" style="margin-right: 10px; text-decoration: none; color: #28a745;">Modifier</a>
                 <form action="{{ route('annonces.destroy', $annonce) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(event);">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer;">Delete</button>
+                    <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer;">Supp</button>
                 </form>
             @else
-                <span style="color: gray; cursor: not-allowed;">Edit</span>
-                <span style="color: gray; cursor: not-allowed;">Delete</span>
+                <span style="color: gray; cursor: not-allowed;">Modifier</span>
+                <span style="color: gray; cursor: not-allowed;">Supp</span>
             @endif
 
             @if ($annonce->paiement && $annonce->paiement->status === 'complet')
                 <a href="{{ route('annonces.invoice', $annonce->id) }}" style="margin-left: 10px; text-decoration: none; color: #007bff;">
-                    Invoice
+                    Telecharger reçu
                 </a>
             @endif
         </td>

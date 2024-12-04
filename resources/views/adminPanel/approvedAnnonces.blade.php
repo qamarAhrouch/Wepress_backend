@@ -245,11 +245,10 @@
     <table>
         <thead>
             <tr>
+                <th>User</th>
                 <th>Title</th>
                 <th>Type</th>
-                <th>User</th>
-                <th>Date Creation</th>
-                <!-- <th>Date Parution</th> -->
+                <th>Ref Web</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -263,17 +262,12 @@
                 <!-- Loop through announcements -->
                 @foreach ($annonces as $ann)
                     <tr>
+                        <td>{{ $ann->user->name ?? 'Unknown' }}</td>
                         <td>{{ $ann->title }}</td>
                         <td>{{ $ann->type }}</td>
-                        <td>{{ $ann->user->name ?? 'Unknown' }}</td>
-                        <td>{{ $ann->created_at->format('Y-m-d') }}</td>
-                        <!-- <td>
-                            @if ($ann->date_parution && strtotime($ann->date_parution))
-                                {{ \Carbon\Carbon::parse($ann->date_parution)->format('Y-m-d') }}
-                            @else
-                                N/A
-                            @endif
-                        </td> -->
+                        
+                        <td>{{ $ann->ref_web }}</td>
+                      
                         <td>
                             <a href="{{ route('annonce.view', $ann->id) }}" class="action-link">View</a>
                         </td>

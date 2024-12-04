@@ -4,6 +4,7 @@ use App\Http\Controllers\AnnonceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\SousAdminController;
 use App\Http\Controllers\PackController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ Route::middleware(['auth', 'role:client'])->group(function () {
 // Routes for admin dashboard
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashAdmin', [AdminController::class, 'index'])->name('admin');
+    Route::get('/impersonate/{user}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
+    Route::get('/stop-impersonation', [ImpersonationController::class, 'stopImpersonation'])->name('admin.stopImpersonation');
+
 });
 
 // Routes for sous-admin dashboard

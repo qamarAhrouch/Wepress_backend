@@ -81,9 +81,9 @@
         </div>
     </div>
     <div class="content">
-        <h2 style="text-align: center; margin-bottom: 20px;">Facture</h2>
+        <h2 style="text-align: center; margin-bottom: 20px;">Reçu </h2>
         <p><strong>Date:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
-        <p><strong>Facture N°:</strong> {{ $paiement->invoice_number }}</p>
+        <p><strong>Reçu N°:</strong> {{ $paiement->invoice_number }}</p>
         <p><strong>A:</strong> {{ $paiement->annonce->user->name }}</p>
 
         <h3 style="margin-bottom: 10px;">Détails de l'annonce</h3>

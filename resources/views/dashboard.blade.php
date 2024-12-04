@@ -26,58 +26,75 @@
 </head>
 <body class="bg-light">
     <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-    <a class="navbar-brand" 
-        href="{{ match(auth()->user()->role) {
-            'admin' => route('admin'),
-            'sous-admin' => route('sousAdmin'),
-            'client' => route('dashboard'),
-            default => route('login')
-        } }}">
-            {{ auth()->user()->name }}
-    </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active"
-                       href="{{ match(auth()->user()->role) {
-                           'admin' => route('admin'),
-                           'sous-admin' => route('sousAdmin'),
-                           'client' => route('dashboard'),
-                           default => route('login')
-                       } }}">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('annonces.index') }}">My Announcements</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('profile.view') }}">Profile</a>
-                </li>
-                <!-- Logout Button -->
-                <li class="nav-item">
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="nav-link btn btn-link text-white" style="text-decoration: none;">
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" 
+                href="{{ match(auth()->user()->role) {
+                    'admin' => route('admin'),
+                    'sous-admin' => route('sousAdmin'),
+                    'client' => route('dashboard'),
+                    default => route('login')
+                } }}">
+                {{ auth()->user()->name }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           href="{{ match(auth()->user()->role) {
+                               'admin' => route('admin'),
+                               'sous-admin' => route('sousAdmin'),
+                               'client' => route('dashboard'),
+                               default => route('login')
+                           } }}">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('annonces.index') }}">My Announcements</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('profile.view') }}">Profile</a>
+                    </li>
+                    @if (session()->has('impersonate_admin_id'))
+                        <li class="nav-item">
+                            <form action="{{ route('admin.stopImpersonation') }}" method="GET" class="d-inline">
+                                <button type="submit" class="nav-link btn btn-link text-white" style="text-decoration: none;">
+                                    Stop Impersonation
+                                </button>
+                            </form>
+                        </li>
+                    @endif
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-white" style="text-decoration: none;">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
-
+    </nav>
 
     <!-- Main Content -->
     <div class="container py-5">
         <h2 class="text-center mb-4">Welcome, {{ $user->name }}!</h2>
         <div class="row g-4">
+            <!-- Quick Actions -->
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-tools"></i> Quick Actions</h5>
+                        <a href="{{ route('annonces.create') }}" class="btn btn-light mt-3">Create Announcement</a>
+                        <a href="{{ route('annonces.index') }}" class="btn btn-dark mt-3">My Announcements</a>
+                    </div>
+                </div>
+            </div>
             <!-- Announcements Stats -->
             <div class="col-md-4">
                 <div class="card text-white bg-info">
@@ -103,16 +120,7 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="col-md-4">
-                <div class="card text-white bg-warning">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><i class="fas fa-tools"></i> Quick Actions</h5>
-                        <a href="{{ route('annonces.create') }}" class="btn btn-light mt-3">Create Announcement</a>
-                        <a href="{{ route('annonces.index') }}" class="btn btn-dark mt-3">My Announcements</a>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 

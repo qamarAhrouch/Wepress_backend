@@ -10,45 +10,40 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     public function index(Request $request)
-{
-    $admin = Auth::user(); // Authenticated admin user
-    $users = User::whereIn('role', ['client', 'sous-admin'])->get();
-
-    // Retrieve filter parameters
-    $filters = [
-        'ref_web' => $request->input('ref_web'),
-        'type' => $request->input('type'),
-        'date_creation' => $request->input('date_creation'),
-        'date_parution' => $request->input('date_parution'),
-    ];
-
-    // Start building the query for pending announcements
-    $query = Annonce::with(['user', 'paiement']) // Eager load the `paiement` relationship
-                    ->where('status', 'pending');
-
-    // Apply filters if they exist
-    if ($filters['ref_web']) {
-        $query->where('ref_web', $filters['ref_web']);
+    {
+        $admin = Auth::user(); // Authenticated admin user
+        $users = User::whereIn('role', ['client', 'sous-admin'])->get(); // Fetch users for impersonation
+    
+        // Retrieve filter parameters
+        $filters = [
+            'ref_web' => $request->input('ref_web'),
+            'type' => $request->input('type'),
+            'date_creation' => $request->input('date_creation'),
+            'date_parution' => $request->input('date_parution'),
+        ];
+    
+        // Start building the query for pending announcements
+        $query = Annonce::with(['user', 'paiement'])
+                        ->where('status', 'pending');
+    
+        foreach ($filters as $key => $value) {
+            if ($value) {
+                $query->where($key, $value);
+            }
+        }
+    
+        $annonces = $query->get();
+    
+        return view('/adminPanel/dashAdin', compact('admin', 'annonces', 'filters', 'users'));
     }
+    
 
-    if ($filters['type']) {
-        $query->where('type', $filters['type']);
-    }
-
-    if ($filters['date_creation']) {
-        $query->whereDate('created_at', $filters['date_creation']);
-    }
-
-    if ($filters['date_parution']) {
-        $query->whereDate('date_parution', $filters['date_parution']);
-    }
-
-    // Get the filtered results
-    $annonces = $query->get();
-
-    return view('/adminPanel/dashAdin', compact('admin', 'annonces', 'filters', 'users'));
-}
-
+     // View impersonation logs
+     public function impersonationLogs()
+     {
+         $logs = ImpersonationLog::with(['admin', 'user'])->orderByDesc('created_at')->get();
+         return view('/adminPanel/impersonationLogs', compact('logs'));
+     }
     
 
 
